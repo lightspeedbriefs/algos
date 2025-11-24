@@ -264,6 +264,8 @@ private:
             }
             root->value = tmp->value;
             (void)eraseHelper(tmp->value.first, root->right);
+            updateHeight(root.get());
+            rotate(root);
         }
         return true;
     }
