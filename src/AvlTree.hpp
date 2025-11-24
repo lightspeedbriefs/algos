@@ -81,6 +81,7 @@ public:
         return eraseHelper(key, root);
     }
 
+    [[nodiscard]]
     bool erase(iterator i) {
         return eraseHelper(i.node->value.first, root);
     }
@@ -248,16 +249,7 @@ private:
                 root.reset();
             } else {
                 promoted->parent = parent;
-                if(parent != nullptr) {
-                    if(parent->left == root) {
-                        parent->left = std::move(promoted);
-                    } else {
-                        assert(parent->right == root);
-                        parent->right = std::move(promoted);
-                    }
-                } else {
-                    root = std::move(promoted);
-                }
+                root = std::move(promoted);
             }
         } else {
             // 2 valid children; both left and right
