@@ -241,14 +241,13 @@ private:
             return wasErased;
         }
         // Values are equal, we're removing this node.
-        auto* const parent(root->parent);
         if(!root->left || !root->right) {
             auto promoted(root->left != nullptr ? std::move(root->left) : std::move(root->right));
             if(!promoted) {
                 // This node has no children, just delete it and then we're done.
                 root.reset();
             } else {
-                promoted->parent = parent;
+                promoted->parent = root->parent;
                 root = std::move(promoted);
             }
         } else {
