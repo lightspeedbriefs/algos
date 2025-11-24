@@ -134,7 +134,7 @@ private:
     [[nodiscard]]
     static std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
         if(root == nullptr) {
-            root = std::make_unique<Node>(std::pair{key, value}, parent);
+            root = std::make_unique<Node>(value_type{key, value}, parent);
             return std::pair{iterator{root.get()}, true};
         }
         bool left;
