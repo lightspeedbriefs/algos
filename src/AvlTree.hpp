@@ -64,6 +64,7 @@ public:
             return node == rhs.node;
         }
     private:
+        friend class AvlTree<K, V, Compare>;
         N* node{nullptr};
     };
 
@@ -78,6 +79,10 @@ public:
     [[nodiscard]]
     bool erase(const K& key) {
         return eraseHelper(key, root);
+    }
+
+    bool erase(iterator i) {
+        return eraseHelper(i.node->value.first, root);
     }
 
     [[nodiscard]]
@@ -216,25 +221,51 @@ private:
         }
     }
 
-    static bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
+    bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
         if(root == nullptr) {
             return false;
         }
         if(Compare{}(key, root->value.first)) {
-            return eraseHelper(key, root->left);
+            const auto wasErased(eraseHelper(key, root->left));
+            updateHeight(root.get());
+            rotate(root);
+            return wasErased;
         } else if(Compare{}(root->value.first, key)) {
-            return eraseHelper(key, root->right);
+            const auto wasErased(eraseHelper(key, root->right));
+            updateHeight(root.get());
+            rotate(root);
+            return wasErased;
         }
-        // Values are equal
+        // Values are equal, we're removing this node.
         auto* const parent(root->parent);
-        if(root->right) {
+        if(!root->left || !root->right) {
+            auto promoted(root->left != nullptr ? std::move(root->left) : std::move(root->right));
+            if(!promoted) {
+                // This node has no children, just delete it and then we're done.
+                root.reset();
+            } else {
+                promoted->parent = parent;
+                if(parent != nullptr) {
+                    if(parent->left == root) {
+                        parent->left = std::move(promoted);
+                    } else {
+                        assert(parent->right == root);
+                        parent->right = std::move(promoted);
+                    }
+                } else {
+                    this->root = std::move(promoted);
+                }
+            }
+        } else {
+            // 2 valid children; both left and right
             auto* tmp(root->right.get());
             while(tmp->left) {
                 tmp = tmp->left.get();
             }
+            root->value = tmp->value;
             (void)eraseHelper(tmp->value.first, root->right);
         }
-        updateHeight(parent);
+        return true;
     }
 };
 

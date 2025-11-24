@@ -25,4 +25,18 @@ int main(int, char**) {
     for(const auto& [key, value] : ages) {
         std::cout << '(' << key << ", " << value << ")\n";
     }
+    bool wasErased(ages.erase(pos));
+    assert(wasErased);
+    std::cout << "Contents of AVL tree:\n";
+    for(const auto& [key, value] : ages) {
+        std::cout << '(' << key << ", " << value << ")\n";
+    }
+    std::tie(pos, wasInserted) = ages.insert("Arthur", 142);
+    assert(wasInserted);
+    wasErased = ages.erase("Ben");
+    assert(wasErased);
+    std::cout << "Contents of AVL tree:\n";
+    for(const auto& [key, value] : ages) {
+        std::cout << '(' << key << ", " << value << ")\n";
+    }
 }
