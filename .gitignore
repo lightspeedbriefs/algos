@@ -42,3 +42,5 @@
 
 build/
 tags
+compile_commands.json
+.cache/
