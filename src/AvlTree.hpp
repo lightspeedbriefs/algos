@@ -26,17 +26,21 @@ private:
         std::unique_ptr<Node> left, right;
     };
 public:
+    template<typename N=Node>
     struct Iterator {
-        explicit Iterator(const Node* node) : node(node) {}
+        explicit Iterator(N* node) : node(node) {}
         Iterator& operator++() {
             if(node->right) {
                 node = node->right.get();
+                while(node->left) {
+                    node = node->left.get();
+                }
                 return *this;
             }
             bool done(false);
             while(!done) {
                 auto* const parent(node->parent);
-                done = (parent == nullptr || node = parent->left.get());
+                done = (parent == nullptr || node == parent->left.get());
                 node = parent;
             }
             return *this;
@@ -46,18 +50,25 @@ public:
             ++(*this);
             return old;
         }
-        value_type& operator*() {
+        [[nodiscard]]
+        auto& operator*() const {
             return node->value;
         }
-        bool operator==(const Iterator& rhs) const {
+        auto* operator->() const {
+            return &node->value;
+        }
+        // Allow comparing iterator with const_iterator
+        template<typename U>
+        [[nodiscard]]
+        bool operator==(const Iterator<U>& rhs) const {
             return node == rhs.node;
         }
     private:
-        Node* node{nullptr};
+        N* node{nullptr};
     };
 
-    using iterator = Iterator;
-    using const_iterator = const Node*;
+    using iterator = Iterator<>;
+    using const_iterator = Iterator<const Node>;
 
     [[nodiscard]]
     std::pair<iterator, bool> insert(const K& key, const V& value) {
@@ -69,24 +80,47 @@ public:
         return eraseHelper(key, root);
     }
 
-    auto begin() const {
+    [[nodiscard]]
+    auto cbegin() const {
+        return beginHelper<const_iterator>();
+    }
+
+    [[nodiscard]]
+    auto begin() {
+        return beginHelper<iterator>();
+    }
+
+    [[nodiscard]]
+    auto end() {
+        return iterator{nullptr};
+    }
+
+    [[nodiscard]]
+    auto cend() const {
+        return const_iterator{nullptr};
+    }
+
+private:
+    std::unique_ptr<Node> root;
+
+    template<typename Iter>
+    [[nodiscard]]
+    auto beginHelper() const {
         if(!root) {
-            return Iterator{nullptr};
+            return Iter{nullptr};
         }
         auto* tmp(root.get());
         while(tmp->left) {
             tmp = tmp->left.get();
         }
-        return Iterator{tmp};
+        return Iter{tmp};
     }
-private:
-    std::unique_ptr<Node> root;
 
     [[nodiscard]]
-    static std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
+    std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
         if(root == nullptr) {
-            root = std::make_unique<Node>(key, value, parent);
-            return std::pair{root.get(), true};
+            root = std::make_unique<Node>(std::pair{key, value}, parent);
+            return std::pair{iterator{root.get()}, true};
         }
         bool left;
         if(Compare{}(key, root->value.first)) {
@@ -95,7 +129,7 @@ private:
             left = false;
         } else {
             // Values are equal
-            return {root.get(), false};
+            return {iterator{root.get()}, false};
         }
         const auto ret(insertHelper(key, value, left ? root->left : root->right, root.get()));
         updateHeight(root.get());
@@ -120,18 +154,21 @@ private:
      *
      * @param oldRoot The root of a left leaning tree.
      */
-    static void rotateRight(std::unique_ptr<Node>& oldRoot) {
+    void rotateRight(std::unique_ptr<Node>& oldRoot) {
         auto newRoot(std::move(oldRoot->left));
         auto* const parent(oldRoot->parent);
         oldRoot->left = std::move(newRoot->right);
         oldRoot->parent = newRoot.get();
         newRoot->right = std::move(oldRoot);
         newRoot->parent = parent;
-        if(parent != nullptr) {
-            parent->left = std::move(newRoot);
-        }
         updateHeight(newRoot->right.get());
         updateHeight(newRoot.get());
+        if(parent != nullptr) {
+            parent->left = std::move(newRoot);
+        } else {
+            assert(!root);
+            root = std::move(newRoot);
+        }
     }
 
     /**
@@ -139,18 +176,21 @@ private:
      *
      * @param oldRoot The root of a right leaning tree.
      */
-    static void rotateLeft(std::unique_ptr<Node>& oldRoot) {
+    void rotateLeft(std::unique_ptr<Node>& oldRoot) {
         auto newRoot(std::move(oldRoot->right));
         auto* const parent(oldRoot->parent);
         oldRoot->right = std::move(newRoot->left);
         oldRoot->parent = newRoot.get();
         newRoot->left = std::move(oldRoot);
         newRoot->parent = parent;
-        if(parent != nullptr) {
-            parent->right = std::move(newRoot);
-        }
         updateHeight(newRoot->left.get());
         updateHeight(newRoot.get());
+        if(parent != nullptr) {
+            parent->right = std::move(newRoot);
+        } else {
+            assert(!root);
+            root = std::move(newRoot);
+        }
     }
 
     /**
@@ -159,17 +199,17 @@ private:
      *
      * @param node The root of a tree that may require rotation.
      */
-    static void rotate(std::unique_ptr<Node>& node) {
+    void rotate(std::unique_ptr<Node>& node) {
         const auto balanceFactor(getBalanceFactor(node.get()));
         if(balanceFactor > 1) {
             // Left leaning tree
-            if(getBalanceFactor(node->left) < 0) {
+            if(getBalanceFactor(node->left.get()) < 0) {
                 rotateLeft(node->left);
             }
             rotateRight(node);
         } else if(balanceFactor < -1) {
             // Right leaning tree
-            if(getBalanceFactor(node->right) > 0) {
+            if(getBalanceFactor(node->right.get()) > 0) {
                 rotateRight(node->right);
             }
             rotateLeft(node);
