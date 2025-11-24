@@ -180,11 +180,7 @@ private:
         newRoot->parent = parent;
         updateHeight(newRoot->right.get());
         updateHeight(newRoot.get());
-        if(parent != nullptr) {
-            parent->left = std::move(newRoot);
-        } else {
-            oldRoot = std::move(newRoot);
-        }
+        oldRoot = std::move(newRoot);
     }
 
     /**
@@ -201,11 +197,7 @@ private:
         newRoot->parent = parent;
         updateHeight(newRoot->left.get());
         updateHeight(newRoot.get());
-        if(parent != nullptr) {
-            parent->right = std::move(newRoot);
-        } else {
-            oldRoot = std::move(newRoot);
-        }
+        oldRoot = std::move(newRoot);
     }
 
     /**
