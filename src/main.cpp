@@ -39,4 +39,14 @@ int main(int, char**) {
     for(const auto& [key, value] : ages) {
         std::cout << '(' << key << ", " << value << ")\n";
     }
+    wasErased = ages.erase("Benjamin");
+    assert(!wasErased);
+    wasErased = ages.erase("Joe");
+    assert(wasErased);
+    wasErased = ages.erase("Arthur");
+    assert(wasErased);
+    std::cout << "Contents of AVL tree:\n";
+    for(const auto& [key, value] : ages) {
+        std::cout << '(' << key << ", " << value << ")\n";
+    }
 }
