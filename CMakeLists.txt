@@ -6,12 +6,13 @@ project(algos
     HOMEPAGE_URL https://github.com/lightspeedbriefs/algos
     LANGUAGES CXX)
 
-set_property(GLOBAL PROPERTY CXX_STANDARD 20)
-set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(GLOBAL PROPERTY CXX_EXTENSIONS OFF)
-set_property(GLOBAL PROPERTY COMPILE_WARNING_AS_ERROR ON)
 
 add_executable(algos_demo src/main.cpp)
+
+set_property(TARGET algos_demo PROPERTY CXX_STANDARD 20)
+set_property(TARGET algos_demo PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET algos_demo PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET algos_demo PROPERTY COMPILE_WARNING_AS_ERROR ON)
 
 target_compile_options(algos_demo PRIVATE -Wall -Wextra)
 target_compile_definitions(algos_demo PRIVATE GLIBCXX_ASSERTIONS)
