@@ -33,6 +33,8 @@ int main(int, char**) {
     }
     std::tie(pos, wasInserted) = ages.insert("Arthur", 142);
     assert(wasInserted);
+    const auto found(ages.find("Arthur"));
+    assert(found == pos);
     wasErased = ages.erase("Ben");
     assert(wasErased);
     std::cout << "Contents of AVL tree:\n";

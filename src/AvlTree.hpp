@@ -105,6 +105,16 @@ public:
         return const_iterator{nullptr};
     }
 
+    [[nodiscard]]
+    iterator find(const K& key) {
+        return findHelper<iterator>(key, root.get());
+    }
+
+    [[nodiscard]]
+    const_iterator find(const K& key) const {
+        return findHelper<const_iterator>(key, root.get());
+    }
+
 private:
     std::unique_ptr<Node> root;
 
@@ -269,6 +279,21 @@ private:
             rotate(root);
         }
         return true;
+    }
+
+    template<typename Iter>
+    [[nodiscard]]
+    static Iter findHelper(const K& key, Node* root) {
+        if(root == nullptr) {
+            return Iter{nullptr};
+        }
+        if(Compare{}(key, root->value.first)) {
+            return findHelper<Iter>(key, root->left.get());
+        } else if(Compare{}(root->value.first, key)) {
+            return findHelper<Iter>(key, root->right.get());
+        }
+        // Values are equal, we found what we're looking for
+        return Iter{root};
     }
 };
 
