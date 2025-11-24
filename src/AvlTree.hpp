@@ -142,6 +142,7 @@ private:
         return ret;
     }
 
+    [[nodiscard]]
     static int getHeight(const Node* const node) {
         return node == nullptr ? -1 : node->height;
     }
@@ -150,6 +151,7 @@ private:
         node->height = std::max(getHeight(node->left.get()), getHeight(node->right.get())) + 1;
     }
 
+    [[nodiscard]]
     static int getBalanceFactor(const Node* const node) {
         return node == nullptr ? 0 : getHeight(node->left.get()) - getHeight(node->right.get());
     }
@@ -219,6 +221,7 @@ private:
         }
     }
 
+    [[nodiscard]]
     static bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
         if(root == nullptr) {
             return false;
