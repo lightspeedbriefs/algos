@@ -122,7 +122,7 @@ private:
     }
 
     [[nodiscard]]
-    std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
+    static std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
         if(root == nullptr) {
             root = std::make_unique<Node>(std::pair{key, value}, parent);
             return std::pair{iterator{root.get()}, true};
@@ -159,7 +159,7 @@ private:
      *
      * @param oldRoot The root of a left leaning tree.
      */
-    void rotateRight(std::unique_ptr<Node>& oldRoot) {
+    static void rotateRight(std::unique_ptr<Node>& oldRoot) {
         auto newRoot(std::move(oldRoot->left));
         auto* const parent(oldRoot->parent);
         oldRoot->left = std::move(newRoot->right);
@@ -171,8 +171,7 @@ private:
         if(parent != nullptr) {
             parent->left = std::move(newRoot);
         } else {
-            assert(!root);
-            root = std::move(newRoot);
+            oldRoot = std::move(newRoot);
         }
     }
 
@@ -181,7 +180,7 @@ private:
      *
      * @param oldRoot The root of a right leaning tree.
      */
-    void rotateLeft(std::unique_ptr<Node>& oldRoot) {
+    static void rotateLeft(std::unique_ptr<Node>& oldRoot) {
         auto newRoot(std::move(oldRoot->right));
         auto* const parent(oldRoot->parent);
         oldRoot->right = std::move(newRoot->left);
@@ -193,8 +192,7 @@ private:
         if(parent != nullptr) {
             parent->right = std::move(newRoot);
         } else {
-            assert(!root);
-            root = std::move(newRoot);
+            oldRoot = std::move(newRoot);
         }
     }
 
@@ -204,7 +202,7 @@ private:
      *
      * @param node The root of a tree that may require rotation.
      */
-    void rotate(std::unique_ptr<Node>& node) {
+    static void rotate(std::unique_ptr<Node>& node) {
         const auto balanceFactor(getBalanceFactor(node.get()));
         if(balanceFactor > 1) {
             // Left leaning tree
@@ -221,7 +219,7 @@ private:
         }
     }
 
-    bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
+    static bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
         if(root == nullptr) {
             return false;
         }
@@ -253,7 +251,7 @@ private:
                         parent->right = std::move(promoted);
                     }
                 } else {
-                    this->root = std::move(promoted);
+                    root = std::move(promoted);
                 }
             }
         } else {
