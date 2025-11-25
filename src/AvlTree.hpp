@@ -116,8 +116,24 @@ public:
         return findHelper<const_iterator>(key, root.get());
     }
 
+    [[nodiscard]]
+    bool empty() const {
+        return root == nullptr;
+    }
+
+    [[nodiscard]]
+    auto size() const {
+        return numElems;
+    }
+
+    void clear() {
+        root.reset();
+        numElems = 0;
+    }
+
 private:
     std::unique_ptr<Node> root;
+    size_t numElems{0};
 
     template<typename Iter>
     [[nodiscard]]
@@ -133,10 +149,11 @@ private:
     }
 
     [[nodiscard]]
-    static std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
+    std::pair<iterator, bool> insertHelper(const K& key, const V& value, std::unique_ptr<Node>& root, Node* parent = nullptr) {
         if(root == nullptr) {
+            ++numElems;
             root = std::make_unique<Node>(value_type{key, value}, parent);
-            return std::pair{iterator{root.get()}, true};
+            return {iterator{root.get()}, true};
         }
         bool left;
         if(Compare{}(key, root->value.first)) {
@@ -225,7 +242,7 @@ private:
     }
 
     [[nodiscard]]
-    static bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
+    bool eraseHelper(const K& key, std::unique_ptr<Node>& root) {
         if(root == nullptr) {
             return false;
         }
@@ -250,6 +267,7 @@ private:
                 promoted->parent = root->parent;
                 root = std::move(promoted);
             }
+            --numElems;
         } else {
             // 2 valid children; both left and right
             auto* tmp(root->right.get());

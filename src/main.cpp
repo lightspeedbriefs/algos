@@ -51,4 +51,16 @@ int main(int, char**) {
     for(const auto& [key, value] : ages) {
         std::cout << '(' << key << ", " << value << ")\n";
     }
+    std::cout << "Size of AVL tree: " << ages.size() << '\n';
+    assert(ages.empty());
+    assert(ages.size() == 0);
+    std::tie(pos, wasInserted) = ages.insert("Ben", 99);
+    assert(wasInserted);
+    std::tie(pos, wasInserted) = ages.insert("Arthur", 42);
+    assert(wasInserted);
+    assert(ages.size() == 2);
+    assert(!ages.empty());
+    ages.clear();
+    assert(ages.size() == 0);
+    assert(ages.empty());
 }
