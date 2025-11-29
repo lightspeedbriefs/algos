@@ -251,7 +251,8 @@ private:
             updateHeight(root.get());
             rotate(root);
             return wasErased;
-        } else if(Compare{}(root->value.first, key)) {
+        }
+        if(Compare{}(root->value.first, key)) {
             const auto wasErased(eraseHelper(key, root->right));
             updateHeight(root.get());
             rotate(root);
@@ -290,7 +291,8 @@ private:
         }
         if(Compare{}(key, root->value.first)) {
             return findHelper<Iter>(key, root->left.get());
-        } else if(Compare{}(root->value.first, key)) {
+        }
+        if(Compare{}(root->value.first, key)) {
             return findHelper<Iter>(key, root->right.get());
         }
         // Values are equal, we found what we're looking for
