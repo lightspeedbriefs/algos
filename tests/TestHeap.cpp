@@ -1,10 +1,10 @@
-#include <functional>
 #define BOOST_TEST_MODULE HeapTests
 
 #include <boost/test/unit_test.hpp>
 
 #include "Heap.hpp"
 
+#include <functional>
 #include <string>
 #include <vector>
 #include <deque>
