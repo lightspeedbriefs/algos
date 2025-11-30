@@ -80,9 +80,7 @@ void make_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
         return;
     }
     for(int64_t i=((numElems - 2) / 2); i>=0; --i) {
-        size_t parentIdx(i);
-        size_t childIdx((i * 2) + 1);
-        while(childIdx < numElems) {
+        for(size_t parentIdx(i), childIdx((i * 2) + 1); childIdx < numElems; parentIdx = std::exchange(childIdx, (childIdx * 2) + 1)) {
             const auto parent(std::next(first, parentIdx));
             auto child(std::next(first, childIdx));
             if(const auto rightChild(std::next(child, 1)); rightChild != last) {
@@ -97,7 +95,6 @@ void make_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
                 break;
             }
             std::swap(*parent, *child);
-            parentIdx = std::exchange(childIdx, (childIdx * 2) + 1);
         }
     }
 }
