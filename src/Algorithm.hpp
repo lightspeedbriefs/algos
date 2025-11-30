@@ -97,8 +97,7 @@ void make_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
                 break;
             }
             std::swap(*parent, *child);
-            parentIdx = childIdx;
-            childIdx = (childIdx * 2) + 1;
+            parentIdx = std::exchange(childIdx, (childIdx * 2) + 1);
         }
     }
 }
