@@ -79,7 +79,7 @@ void make_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
     if(numElems <= 1) {
         return;
     }
-    for(int64_t i=((numElems - 2)/ 2); i>=0; --i) {
+    for(int64_t i=((numElems - 2) / 2); i>=0; --i) {
         size_t parentIdx(i);
         size_t childIdx((i * 2) + 1);
         while(childIdx < numElems) {
