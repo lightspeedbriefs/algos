@@ -33,5 +33,19 @@ target_compile_definitions(avl_tests PRIVATE GLIBCXX_ASSERTIONS)
 target_include_directories(avl_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(avl_tests PRIVATE Boost::unit_test_framework)
 
+add_executable(heap_tests tests/TestHeap.cpp)
+
+set_property(TARGET heap_tests PROPERTY CXX_STANDARD 20)
+set_property(TARGET heap_tests PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET heap_tests PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET heap_tests PROPERTY COMPILE_WARNING_AS_ERROR ON)
+set_property(TARGET heap_tests PROPERTY EXPORT_COMPILE_COMMANDS ON)
+
+target_compile_options(heap_tests PRIVATE -Wall -Wextra)
+target_compile_definitions(heap_tests PRIVATE GLIBCXX_ASSERTIONS)
+target_include_directories(heap_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(heap_tests PRIVATE Boost::unit_test_framework)
+
 enable_testing()
 add_test(NAME avl_tests COMMAND avl_tests)
+add_test(NAME heap_tests COMMAND heap_tests)
