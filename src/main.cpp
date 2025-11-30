@@ -5,7 +5,9 @@
 
 #include "AvlTree.hpp"
 
-int main(int, char**) {
+// NOLINTBEGIN(readability-magic-numbers)
+
+int main(int /*unused*/, char** /*unused*/) {
     algos::AvlTree<std::string, int> ages;
     auto [pos, wasInserted] = ages.insert("Joe", 25);
     assert(wasInserted);
@@ -63,4 +65,7 @@ int main(int, char**) {
     ages.clear();
     assert(ages.size() == 0);
     assert(ages.empty());
+    return 0;
 }
+
+// NOLINTEND(readability-magic-numbers)
