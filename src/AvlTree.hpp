@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <ostream>
 #include <utility>
 
 namespace algos {
@@ -28,7 +29,6 @@ private:
 public:
     template<typename N=Node>
     struct Iterator {
-        explicit Iterator(N* node) : node(node) {}
         Iterator& operator++() {
             if(node->right) {
                 node = node->right.get();
@@ -63,8 +63,15 @@ public:
         bool operator==(const Iterator<U>& rhs) const {
             return node == rhs.node;
         }
+        friend std::ostream& operator<<(std::ostream& out, const Iterator& iter) {
+            if(iter.node == nullptr) {
+                return out << "nullptr";
+            }
+            return out << "(" << iter->first << ", " << iter->second << ")";
+        }
     private:
         friend class AvlTree<K, V, Compare>;
+        explicit Iterator(N* node) : node(node) {}
         N* node{nullptr};
     };
 
