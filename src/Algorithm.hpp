@@ -74,8 +74,33 @@ void pop_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
  * @param cmp
  */
 template<typename RandomIt, class Compare = std::less<>>
-void make_heap(RandomIt first, RandomIt last, Compare cmp) {
-
+void make_heap(RandomIt first, RandomIt last, Compare cmp = Compare{}) {
+    const size_t numElems(std::distance(first, last));
+    if(numElems <= 1) {
+        return;
+    }
+    for(int64_t i=((numElems - 2)/ 2); i>=0; --i) {
+        size_t parentIdx(i);
+        size_t childIdx((i * 2) + 1);
+        while(childIdx < numElems) {
+            const auto parent(std::next(first, parentIdx));
+            auto child(std::next(first, childIdx));
+            if(const auto rightChild(std::next(child, 1)); rightChild != last) {
+                // Right child is valid.  We will compare the parent value
+                // to whichever child value is "greater"
+                if(cmp(*child, *rightChild)) {
+                    ++childIdx;
+                    child = rightChild;
+                }
+            }
+            if(cmp(*child, *parent)) {
+                break;
+            }
+            std::swap(*parent, *child);
+            parentIdx = childIdx;
+            childIdx = (childIdx * 2) + 1;
+        }
+    }
 }
 
 }

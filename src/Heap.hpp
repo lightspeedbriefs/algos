@@ -22,6 +22,34 @@ namespace algos {
 template<typename T, typename Container = std::vector<T>, typename Compare = std::less<typename Container::value_type>>
 class Heap {
 public:
+    Heap() = default;
+
+    template<typename InputIt>
+    Heap(InputIt first, InputIt last, Compare cmp = Compare{})
+        : storage(first, last),
+          comp(cmp)
+    {
+        algos::make_heap(std::begin(storage), std::end(storage), comp);
+    }
+
+    Heap(const Compare& cmp, const Container& cont)
+        : storage(cont),
+          comp(cmp)
+    {
+        algos::make_heap(std::begin(storage), std::end(storage), comp);
+    }
+
+    Heap(const Compare& cmp, Container&& cont)
+        : storage(std::move(cont)),
+          comp(cmp)
+    {
+        algos::make_heap(std::begin(storage), std::end(storage), comp);
+    }
+
+    explicit Heap(const Compare& cmp)
+        : comp(cmp)
+    {}
+
     [[nodiscard]]
     auto& top() const {
         return storage.front();
@@ -41,16 +69,17 @@ public:
 
     void push(const value_type& value) {
         storage.push_back(value);
-        algos::push_heap(std::begin(storage), std::end(storage), Compare{});
+        algos::push_heap(std::begin(storage), std::end(storage), comp);
     }
 
     void pop() {
-        algos::pop_heap(std::begin(storage), std::end(storage), Compare{});
+        algos::pop_heap(std::begin(storage), std::end(storage), comp);
         storage.pop_back();
     }
 
 private:
     Container storage;
+    Compare comp{};
 };
 
 }
